@@ -3,4 +3,5 @@
 # tips
 需要安装pillow，pillow有相关依赖库，
 > sudo apt-get install libjpeg-dev
+
 > pip3 install pillow
