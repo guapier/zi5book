@@ -17,6 +17,7 @@ from scrapy.pipelines.images import ImagesPipeline
 from scrapy.exceptions import DropItem
 import scrapy
 
+
 class MongoDBPipeline(object):
     def __init__(self):
         connection = pymongo.MongoClient(
@@ -24,7 +25,7 @@ class MongoDBPipeline(object):
             settings['MONGODB_PORT']
         )
         self.db = connection[settings['MONGODB_DB']]
-        self.collection=self.db[settings['MONGODB_COLLECTION']]
+        self.collection = self.db[settings['MONGODB_COLLECTION']]
 
     def process_item(self, item, spider):
         valid = True
@@ -41,19 +42,18 @@ class MongoDBPipeline(object):
         return item
 
 
-
-
-
 class MyImagePipelines(ImagesPipeline):
     def get_media_requests(self, item, info):
-            for image_url in item['image_urls']:
-                # 这里我把item传过去,因为后面需要用item里面的书名和章节作为文件名
-                yield scrapy.Request(image_url, meta={'item': item})
+        for image_url in item['image_urls']:
+            # 这里我把item传过去,因为后面需要用item里面的书名和章节作为文件名
+            yield scrapy.Request(image_url, meta={'item': item})
+
     def item_completed(self, results, item, info):
         image_paths = [x['path'] for ok, x in results if ok]
         if not image_paths:
             raise DropItem("Item contains no images")
         return item
+
     def file_path(self, request, response=None, info=None):
         item = request.meta['item']
         # 从URL提取图片的文件名
@@ -63,17 +63,18 @@ class MyImagePipelines(ImagesPipeline):
         return filename
 
 
-
 class MyFilePipelines(FilesPipeline):
     def get_media_requests(self, item, info):
-            for image_url in item['file_urls']:
-                # 这里我把item传过去,因为后面需要用item里面的书名和章节作为文件名
-                yield scrapy.Request(image_url, meta={'item': item})
+        for image_url in item['file_urls']:
+            # 这里我把item传过去,因为后面需要用item里面的书名和章节作为文件名
+            yield scrapy.Request(image_url, meta={'item': item})
+
     def item_completed(self, results, item, info):
         image_paths = [x['path'] for ok, x in results if ok]
         if not image_paths:
             raise DropItem("Item contains no images")
         return item
+
     def file_path(self, request, response=None, info=None):
         item = request.meta['item']
         # 从URL提取图片的文件名
